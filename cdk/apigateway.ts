@@ -36,7 +36,7 @@ export class ApiStack extends Stack {
       tableClass: dynamodb.TableClass.STANDARD,
       removalPolicy: RemovalPolicy.DESTROY,
       partitionKey: {
-        name: 'path',
+        name: 'contentPath',
         type: dynamodb.AttributeType.STRING,
       },
       sortKey: {
