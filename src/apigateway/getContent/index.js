@@ -2,12 +2,12 @@ const sdk = require('aws-sdk');
 
 const handler = async (event) => {
   console.log(JSON.stringify(event));
-  const parameters = event.queryStringParameters;
-  console.log(`Params: ${parameters}`);
+  const path = event.queryStringParameters.contentPath;
+  console.log(`Path: ${path}`)
   const tableName = process.env.ContentTable || 'ContentTable';
   const dbClient = new sdk.DynamoDB.DocumentClient();
   let body;
-  if (!parameters) {
+  if (!path) {
     console.log('no path');
     body = await dbClient.scan({
       TableName: tableName,
@@ -16,7 +16,7 @@ const handler = async (event) => {
     const params = {
       KeyConditionExpression: 'contentPath = :contentPath',
       ExpressionAttributeValues: {
-        ':contentPath': 'swag',
+        ':contentPath': path,
       },
       TableName: tableName,
     };
