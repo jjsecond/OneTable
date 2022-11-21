@@ -2,7 +2,7 @@ const sdk = require('aws-sdk');
 
 const handler = async (event) => {
   console.log(JSON.stringify(event));
-  const path = event.queryStringParameters.contentPath;
+  const path = event?.queryStringParameters?.contentPath || null;
   console.log(`Path: ${path}`)
   const tableName = process.env.ContentTable || 'ContentTable';
   const dbClient = new sdk.DynamoDB.DocumentClient();
@@ -16,7 +16,7 @@ const handler = async (event) => {
     const params = {
       KeyConditionExpression: 'contentPath = :contentPath',
       ExpressionAttributeValues: {
-        ':contentPath': path,
+        ':contentPath': 'swag',//path,
       },
       TableName: tableName,
     };
@@ -24,6 +24,7 @@ const handler = async (event) => {
     body = await dbClient.query(params, (data) => {
       console.log(data);
     }).promise();
+    console.log(JSON.stringify(body));
     body = body.Items[0];
   }
 
