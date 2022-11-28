@@ -23,7 +23,7 @@ export class ApiStack extends Stack {
           'Authorization',
           'X-ApiKey', // TODO: Auth
         ],
-        allowMethods: ['GET', 'PUT'],
+        allowMethods: ['GET', 'PUT', 'DELETE'],
         allowCredentials: true,
         allowOrigins: [
           '*', // TODO: Restrict
@@ -36,7 +36,7 @@ export class ApiStack extends Stack {
       tableClass: dynamodb.TableClass.STANDARD,
       removalPolicy: RemovalPolicy.DESTROY,
       partitionKey: {
-        name: 'contentPath',
+        name: 'id',
         type: dynamodb.AttributeType.STRING,
       },
       sortKey: {
@@ -46,9 +46,10 @@ export class ApiStack extends Stack {
     });
 
     [
-      { name: 'getContent', method: 'GET' },
-      { name: 'createContent', method: 'PUT' },
-      // { name: 'deleteContent', method: 'DELETE' },
+      { name: 'getContentByID', method: 'GET' },
+      { name: 'getAllContent', method: 'GET' },
+      { name: 'upsertContent', method: 'PUT' },
+      { name: 'deleteContent', method: 'DELETE' },
     ].forEach((func) => {
       const lambdaFunction = new lambda.Function(
         this,
@@ -60,6 +61,10 @@ export class ApiStack extends Stack {
             path.join(__dirname, `/../src/apigateway/${func.name}`)
           ),
           handler: 'index.handler',
+          environment: {
+            TABLE_NAME: 'ContentTable',
+            PRIMARY_KEY: 'contentID'
+          }
         }
       );
 
@@ -70,8 +75,11 @@ export class ApiStack extends Stack {
         new apiGateway.LambdaIntegration(lambdaFunction, { proxy: true })
       );
 
+      resource.addResource('{id}');
+
       switch (func.method) {
         case 'PUT': // Explicitly grant write access
+        case 'DELETE':
           dynamoDbTable.grantReadWriteData(lambdaFunction);
         default: // Default to read only
           dynamoDbTable.grantReadData(lambdaFunction);
