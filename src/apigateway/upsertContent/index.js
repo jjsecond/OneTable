@@ -1,24 +1,43 @@
-import { DynamoDB } from "aws-sdk";
+const sdk = require("aws-sdk");
+const dbClient = new sdk.DynamoDB.DocumentClient();
 
-const db = new DynamoDB.DocumentClient();
+const tableName = process.env.ContentTable || "ContentTable";
 
-// const TABLE_NAME = process.env.TABLE_NAME || "";
-// const PRIMARY_KEY = process.env.PRIMARY_KEY || "";
+const handler = async (event) => {
+  const article = JSON.parse(event.body);
+  if(article === null || article === undefined){
+    return  { statusCode: 400, body: `no body: ${event.body}` };
+  }
 
-export const handler = async (event) => {
-  // const item =JSON.parse(event.body);
-
-
-  // const params = {
-  //   TableName: TABLE_NAME,
-  //   Item: {itemId: item.id, test: item.test},
-  // };
+  const params = {
+    TableName: tableName,
+    Item: {
+      contentId: article.contentPath,
+      datePublishedEpox: Date.now(),
+      section: article.section,
+      body: article.body,
+    },
+  };
 
   try {
-    // await db.put(params).promise();
+    await dbClient.put(params).promise();
     console.log(event);
-    return { statusCode: 200, body: event };
+    return { statusCode: 200, body: `Successfully added: ${event.body}` };
   } catch (error) {
     return { statusCode: 400, body: JSON.stringify(error) };
   }
 };
+
+exports.handler = handler;
+
+
+/*
+headline: '',
+  contentPath: '',
+  datePublishedEpox: number,
+  section: '',
+  body: ''
+
+
+*/
+
