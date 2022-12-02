@@ -3,13 +3,19 @@ const dbClient = new sdk.DynamoDB.DocumentClient();
 const tableName = process.env.ContentTable || "ContentTable";
 
 const handler = async (event) => {
+
+   const body = event.pathParameters;
+
+   console.log(body)
  
-  const body = JSON.parse(event.body)
-  console.log(body);
+  const id = body.contentId
+  const date = body.date
+  const numDate = parseInt(date);
+
   
   const params = {
     TableName: tableName,
-    Key: { contentId : body.contentId, datePublishedEpox: body.datePublishedEpox},
+    Key: { contentId : id, datePublishedEpox: numDate},
   };
   
 

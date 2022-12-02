@@ -49,7 +49,7 @@ export class ApiStack extends Stack {
       { name: "getContentByID", method: "PUT", addId: false },
       { name: "getAllContent", method: "GET", addId: false },
       { name: "upsertContent", method: "PUT", addId: false },
-      { name: "deleteContent", method: "DELETE", addId: false },
+      { name: "deleteContent", method: "DELETE", addId: true },
     ].forEach((func) => {
       const lambdaFunction = new lambda.Function(
         this,
@@ -72,10 +72,12 @@ export class ApiStack extends Stack {
 
       if (func.addId === true) {
         const customer = resource.addResource("{contentId}");
-        customer.addMethod(
+        const date = customer.addResource("{date}");
+      
+        date.addMethod(
           func.method,
           new apiGateway.LambdaIntegration(lambdaFunction, { proxy: true })
-        );
+        )
       }else{
       resource.addMethod(
         func.method,
