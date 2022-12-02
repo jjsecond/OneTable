@@ -46,7 +46,7 @@ export class ApiStack extends Stack {
     });
 
     [
-      { name: "getContentByID", method: "PUT", addId: false },
+      { name: "getContentByID", method: "GET", addId: true },
       { name: "getAllContent", method: "GET", addId: false },
       { name: "upsertContent", method: "PUT", addId: false },
       { name: "deleteContent", method: "DELETE", addId: true },

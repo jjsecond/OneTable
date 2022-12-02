@@ -4,13 +4,19 @@ const tableName = process.env.ContentTable || "ContentTable";
 
 const handler = async (event) => {
 
-  const body = JSON.parse(event.body)
-  console.log(body);
-  
-  const params = {
-    TableName: tableName,
-    Key: { contentId : body.contentId, datePublishedEpox: body.datePublishedEpox},
-  };
+  const body = event.pathParameters;
+
+  console.log(body)
+
+ const id = body.contentId
+ const date = body.date
+ const numDate = parseInt(date);
+
+ 
+ const params = {
+   TableName: tableName,
+   Key: { contentId : id, datePublishedEpox: numDate},
+ };
   
   
   try {
