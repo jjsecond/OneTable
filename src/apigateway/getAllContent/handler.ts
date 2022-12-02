@@ -1,12 +1,11 @@
-const sdk = require("aws-sdk");
-const dbClient = new sdk.DynamoDB.DocumentClient();
+import * as AWS from "aws-sdk";
+const tableName = process.env.ContentTable || "ContentTable";
+
+const dbClient = new AWS.DynamoDB.DocumentClient();
 
 const handler = async () => {
-
-  const tableName = process.env.ContentTable || "ContentTable";
-
   try {
-   const records =  await dbClient
+    const records = await dbClient
       .scan({
         TableName: tableName,
       })
