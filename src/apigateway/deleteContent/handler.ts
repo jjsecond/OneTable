@@ -1,15 +1,17 @@
-const sdk = require('aws-sdk');
-const dbClient = new sdk.DynamoDB.DocumentClient();
+import * as AWS from "aws-sdk";
+import { APIGatewayEvent } from "aws-lambda";
 const tableName = process.env.ContentTable || "ContentTable";
 
-const handler = async (event) => {
+const dbClient = new AWS.DynamoDB.DocumentClient();
+
+const handler = async (event: APIGatewayEvent) => {
 
    const body = event.pathParameters;
 
    console.log(body)
  
-  const id = body.contentId
-  const date = body.date
+  const id = body?.contentId
+  const date = body?.date || '';
   const numDate = parseInt(date);
 
   

@@ -7,6 +7,7 @@ import {
   RemovalPolicy,
   aws_dynamodb as dynamodb,
 } from "aws-cdk-lib";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 import * as path from "path";
 
@@ -51,16 +52,24 @@ export class ApiStack extends Stack {
       { name: "upsertContent", method: "PUT", addId: false },
       { name: "deleteContent", method: "DELETE", addId: true },
     ].forEach((func) => {
-      const lambdaFunction = new lambda.Function(
+      const lambdaFunction = new NodejsFunction(
         this,
         `cdkWorkshop${func.name}Lambda`,
         {
           functionName: `cdkWorkshop${func.name}Lambda`,
           runtime: lambda.Runtime.NODEJS_14_X,
-          code: lambda.Code.fromAsset(
-            path.join(__dirname, `/../src/apigateway/${func.name}`)
+          bundling: {
+            externalModules: ["aws-sdk"],
+          },
+          depsLockFilePath: path.join(__dirname, "..", "package-lock.json"),
+          entry: path.join(
+            __dirname,
+            "..",
+            "src",
+            "apigateway",
+            func.name,
+            "handler.ts"
           ),
-          handler: "index.handler",
           environment: {
             TABLE_NAME: "ContentTable",
             PRIMARY_KEY: "contentId",
@@ -73,19 +82,17 @@ export class ApiStack extends Stack {
       if (func.addId === true) {
         const customer = resource.addResource("{contentId}");
         const date = customer.addResource("{date}");
-      
+
         date.addMethod(
           func.method,
           new apiGateway.LambdaIntegration(lambdaFunction, { proxy: true })
-        )
-      }else{
-      resource.addMethod(
-        func.method,
-        new apiGateway.LambdaIntegration(lambdaFunction, { proxy: true })
-      );
+        );
+      } else {
+        resource.addMethod(
+          func.method,
+          new apiGateway.LambdaIntegration(lambdaFunction, { proxy: true })
+        );
       }
-
-    
 
       switch (func.method) {
         case "PUT": // Explicitly grant write access

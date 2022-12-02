@@ -1,12 +1,14 @@
-const sdk = require("aws-sdk");
-const dbClient = new sdk.DynamoDB.DocumentClient();
+import * as AWS from "aws-sdk";
+import { APIGatewayEvent } from "aws-lambda";
+
+const dbClient = new AWS.DynamoDB.DocumentClient();
 
 const tableName = process.env.ContentTable || "ContentTable";
 
-const handler = async (event) => {
-  const article = JSON.parse(event.body);
-  if(article === null || article === undefined){
-    return  { statusCode: 400, body: `no body: ${event.body}` };
+export const handler = async (event: APIGatewayEvent) => {
+  const article = JSON.parse(event.body || "");
+  if (article === null || article === undefined) {
+    return { statusCode: 400, body: `no body: ${event.body}` };
   }
 
   const params = {
@@ -28,9 +30,6 @@ const handler = async (event) => {
   }
 };
 
-exports.handler = handler;
-
-
 /*
 headline: '',
   contentPath: '',
@@ -40,4 +39,3 @@ headline: '',
 
 
 */
-
