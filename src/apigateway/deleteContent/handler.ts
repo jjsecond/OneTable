@@ -2,6 +2,7 @@ import * as AWS from "aws-sdk";
 import { APIGatewayEvent } from "aws-lambda";
 const tableName = process.env.ContentTable || "ContentTable";
 
+
 const dbClient = new AWS.DynamoDB.DocumentClient();
 
 const handler = async (event: APIGatewayEvent) => {
