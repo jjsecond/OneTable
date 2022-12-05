@@ -1,33 +1,32 @@
-import * as AWS from "aws-sdk";
+// import * as AWS from "aws-sdk";
 import { APIGatewayEvent } from "aws-lambda";
 const tableName = process.env.ContentTable || "ContentTable";
+import { DynamoDB, DeleteItemCommand, DeleteItemCommandInput, DeleteItemCommandOutput } from "@aws-sdk/client-dynamodb";
+import { marshall } from "@aws-sdk/util-dynamodb";
 
+// const dbClient = new AWS.DynamoDB.DocumentClient();
+const ddbClient = new DynamoDB({ region: "us-east-2" });
 
-const dbClient = new AWS.DynamoDB.DocumentClient();
+export const handler = async (event: APIGatewayEvent) => {
+  const body = event.pathParameters;
 
-const handler = async (event: APIGatewayEvent) => {
+  console.log(body);
 
-   const body = event.pathParameters;
-
-   console.log(body)
- 
-  const id = body?.contentId
-  const date = body?.date || '';
+  const id = body?.contentId || "";
+  const date = body?.date || "";
   const numDate = parseInt(date);
 
-  
-  const params = {
+  const getParams: DeleteItemCommandInput = {
     TableName: tableName,
-    Key: { contentId : id, datePublishedEpox: numDate},
+    Key: marshall({ contentId:id , datePublishedEpox: numDate }),
   };
-  
+
+  const response = new DeleteItemCommand(getParams)
 
   try {
-    const result = await dbClient.delete(params).promise();
-    return { statusCode: 200, body: `deleted ${JSON.stringify(result)}` };
+    const result = await ddbClient.send(response);
+    return { statusCode: 200, body: `deleted: ${JSON.stringify(result)}` };
   } catch (error) {
     return { statusCode: 400, body: JSON.stringify(error) };
-  }
-
+  };
 };
-exports.handler = handler;

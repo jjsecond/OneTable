@@ -1,18 +1,30 @@
-import * as AWS from "aws-sdk";
+import {
+  DynamoDB,
+  ScanCommand,
+  ScanCommandInput,
+} from "@aws-sdk/client-dynamodb";
+import { unmarshall, unmarshallOptions } from "@aws-sdk/util-dynamodb";
 const tableName = process.env.ContentTable || "ContentTable";
 
-const dbClient = new AWS.DynamoDB.DocumentClient();
+const ddbClient = new DynamoDB({ region: "us-east-2" });
 
-const handler = async () => {
+export const handler = async () => {
   try {
-    const records = await dbClient
-      .scan({
-        TableName: tableName,
-      })
-      .promise();
+    const scanInput: ScanCommandInput = {
+      TableName: tableName,
+    };
+    
 
+    const scanCommand = new ScanCommand(scanInput)
+
+    const records = await ddbClient.send(scanCommand);
+
+    let response;
+    if(records?.Items && records.Items?.length>0) {
+      response = records.Items.map((item) => unmarshall(item));
+    }
     return {
-      body: JSON.stringify(records),
+      body: JSON.stringify(response),
       statusCode: 200,
       headers: { "Access-Control-Allow-Origin": "*" },
     };
@@ -20,4 +32,3 @@ const handler = async () => {
     return { statusCode: 400, body: JSON.stringify(err) };
   }
 };
-exports.handler = handler;

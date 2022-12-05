@@ -1,7 +1,7 @@
 // import * as AWS from "aws-sdk";
 import { APIGatewayEvent } from "aws-lambda";
 import { DynamoDB, PutItemCommandInput } from "@aws-sdk/client-dynamodb";
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 
 // const dbClient = new AWS.DynamoDB.DocumentClient();
@@ -18,10 +18,10 @@ export const handler = async (event: APIGatewayEvent) => {
   const params: PutItemCommandInput = {
     TableName: tableName,
     Item: {
-      contentId: {S: article.contentPath.toString()},
-      datePublishedEpox: {N: Date.now().toString()},
-      section: { S: article.section},
-      body: {S: article.body},
+      contentId: article.contentPath,
+      datePublishedEpox: article.datePublishedEpox,
+      section: article.section,
+      body: article.body,
     },
   };
 
