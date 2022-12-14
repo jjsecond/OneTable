@@ -3,10 +3,11 @@ import {
   ScanCommand,
   ScanCommandInput,
 } from "@aws-sdk/client-dynamodb";
-import { unmarshall, unmarshallOptions } from "@aws-sdk/util-dynamodb";
-const tableName = process.env.ContentTable || "ContentTable";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { region, tableName } from "../../../config/config";
 
-const ddbClient = new DynamoDB({ region: "us-east-2" });
+
+const ddbClient = new DynamoDB({ region: region });
 
 export const handler = async () => {
   try {

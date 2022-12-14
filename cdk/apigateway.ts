@@ -10,12 +10,15 @@ import {
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 import * as path from "path";
+import { appEnv, tableName } from "../config/config";
 
 export class ApiStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const api = new apiGateway.RestApi(this, "cdkWorkshopApiGateway", {
+    const name = appEnv;
+
+    const api = new apiGateway.RestApi(this, `${name}ApiGateway`, {
       description: "Api for interacting with database",
       defaultCorsPreflightOptions: {
         allowHeaders: [
@@ -32,31 +35,77 @@ export class ApiStack extends Stack {
       },
     });
 
-    const dynamoDbTable = new dynamodb.Table(this, "Content Table", {
-      tableName: "ContentTable",
+    const dynamoDbTable = new dynamodb.Table(this, `${name}DynamoTable`, {
+      tableName: tableName,
       tableClass: dynamodb.TableClass.STANDARD,
       removalPolicy: RemovalPolicy.DESTROY,
       partitionKey: {
-        name: "contentId",
+        name: "pk",
         type: dynamodb.AttributeType.STRING,
       },
       sortKey: {
-        name: "datePublishedEpox",
-        type: dynamodb.AttributeType.NUMBER,
+        name: "sk",
+        type: dynamodb.AttributeType.STRING,
       },
+      writeCapacity: 1,
+      readCapacity: 1,
     });
 
     [
-      { name: "getContentByID", method: "GET", addId: true },
-      { name: "getAllContent", method: "GET", addId: false },
-      { name: "upsertContent", method: "PUT", addId: false },
-      { name: "deleteContent", method: "DELETE", addId: true },
+      {
+        name: "getContentByID",
+        method: "GET",
+        addId: true,
+        lambdaFolder: "article",
+      },
+      {
+        name: "getAllContent",
+        method: "GET",
+        addId: false,
+        lambdaFolder: "article",
+      },
+      {
+        name: "upsertContent",
+        method: "PUT",
+        addId: false,
+        lambdaFolder: "article",
+      },
+      {
+        name: "deleteContent",
+        method: "DELETE",
+        addId: true,
+        lambdaFolder: "article",
+      },
+      {
+        name: "getAuthorById",
+        method: "GET",
+        addId: true,
+        lambdaFolder: "author",
+      },
+      {
+        name: "getAllAuthors",
+        method: "GET",
+        addId: false,
+        lambdaFolder: "author",
+      },
+      {
+        name: "createAnAuthor",
+        method: "PUT",
+        addId: false,
+        lambdaFolder: "author",
+      },
+      {
+        name: "deleteAuthor",
+        method: "DELETE",
+        addId: true,
+        lambdaFolder: "author",
+      },
     ].forEach((func) => {
       const lambdaFunction = new NodejsFunction(
         this,
-        `cdkWorkshop${func.name}Lambda`,
+        `${name}${func.name}Lambda`,
         {
-          functionName: `cdkWorkshop${func.name}Lambda`,
+          functionName: `${func.name}Lambda`,
           runtime: lambda.Runtime.NODEJS_14_X,
           bundling: {
             externalModules: ["aws-sdk"],
@@ -71,8 +120,8 @@ export class ApiStack extends Stack {
             "handler.ts"
           ),
           environment: {
-            TABLE_NAME: "ContentTable",
-            PRIMARY_KEY: "contentId",
+            TABLE_NAME: tableName,
+            PRIMARY_KEY: "pk",
           },
         }
       );
@@ -80,10 +129,10 @@ export class ApiStack extends Stack {
       const resource = api.root.addResource(func.name);
 
       if (func.addId === true) {
-        const customer = resource.addResource("{contentId}");
-        const date = customer.addResource("{date}");
+        const primaryKey = resource.addResource("{pk}");
+        const sortKey = primaryKey.addResource("{sk}");
 
-        date.addMethod(
+        sortKey.addMethod(
           func.method,
           new apiGateway.LambdaIntegration(lambdaFunction, { proxy: true })
         );
@@ -102,7 +151,7 @@ export class ApiStack extends Stack {
           dynamoDbTable.grantReadData(lambdaFunction);
       }
 
-      // lambdaFunction.addEnvironment('ContentTable', dynamoDbTable.tableArn);
+      lambdaFunction.addEnvironment(tableName, dynamoDbTable.tableArn);
     });
 
     new CfnOutput(this, "apiUrl", { value: api.url });

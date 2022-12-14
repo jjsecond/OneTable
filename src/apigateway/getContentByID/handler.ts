@@ -1,24 +1,24 @@
 // import * as AWS from "aws-sdk";
 import { APIGatewayEvent } from "aws-lambda";
-const tableName = process.env.ContentTable || "ContentTable";
 import { DynamoDB, GetItemCommand, GetItemCommandInput } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+import { region, tableName } from "../../../config/config";
 
 // const dbClient = new AWS.DynamoDB.DocumentClient();
-const ddbClient = new DynamoDB({ region: "us-east-2" });
+const ddbClient = new DynamoDB({ region: region });
 
 export const handler = async (event: APIGatewayEvent) => {
   const body = event.pathParameters;
 
   console.log(body);
 
-  const id = body?.contentId || "";
-  const date = body?.date || "";
-  const numDate = parseInt(date);
+  const id = body?.pk || "";
+  const date = body?.sk || "";
+  // const numDate = parseInt(date);
 
   const getParams: GetItemCommandInput = {
     TableName: tableName,
-    Key: marshall({ contentId:id , datePublishedEpox: numDate }),
+    Key: marshall({ contentId:id , datePublishedEpox: date }),
   };
 
   const response = new GetItemCommand(getParams)

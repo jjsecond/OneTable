@@ -3,11 +3,11 @@ import { APIGatewayEvent } from "aws-lambda";
 import { DynamoDB, PutItemCommandInput } from "@aws-sdk/client-dynamodb";
 
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { region, tableName } from "../../../config/config";
 
 // const dbClient = new AWS.DynamoDB.DocumentClient();
-const ddbClient = new DynamoDB({ region: "us-east-2" });
+const ddbClient = new DynamoDB({ region: region });
 
-const tableName = process.env.ContentTable || "ContentTable";
 
 export const handler = async (event: APIGatewayEvent) => {
   const article = JSON.parse(event.body || "");
@@ -18,11 +18,13 @@ export const handler = async (event: APIGatewayEvent) => {
   const params: PutItemCommandInput = {
     TableName: tableName,
     Item: {
-      contentId: article.contentPath,
-      datePublishedEpox: article.datePublishedEpox,
+      contentId: article.pk,
+      datePublishedEpox: article.sk,
       section: article.section,
       body: article.body,
     },
+    // faster than doing a scan then a put, it is ATOMIC, no race condition
+    // ConditionExpression: "attribute_not_exists(PK)"
   };
 
   const putReq = new PutCommand(params);
