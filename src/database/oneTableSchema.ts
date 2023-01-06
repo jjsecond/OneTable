@@ -12,12 +12,12 @@ export const MySchema = {
             sk:          { type: String, value: 'article-date#${datePublishedEpox}' },
             // id:          { type: String, generate: 'ulid', validate: /^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$/i },
             contentPath:        { type: String, required: true },
-            datePublishedEpox:      { type: Number, required: true },
+            datePublishedEpox:      { type: String, required: true },
             section: { type: String },
             body: { type: String },
             author: { type: String },
 
-            // gsi1pk: { type: String, value: 'print-attribute#${edition}' },
+            gsi1pk: { type: String, value: 'article-section#${section}' },
             // gsi1sk: { type: String, value: 'print-attribute#${region}' },
         },
         Editor: {

@@ -1,31 +1,31 @@
 // import * as AWS from "aws-sdk";
 import { APIGatewayEvent } from "aws-lambda";
-import { DynamoDB, DeleteItemCommand, DeleteItemCommandInput } from "@aws-sdk/client-dynamodb";
-import { marshall } from "@aws-sdk/util-dynamodb";
-import { region, tableName } from "../../../config/config";
-
-// const dbClient = new AWS.DynamoDB.DocumentClient();
-const ddbClient = new DynamoDB({ region: region });
+import { getTable } from "../../database/getTable";
 
 export const handler = async (event: APIGatewayEvent) => {
-  const body = event.pathParameters;
+  const pathParams = event.pathParameters;
 
-  console.log(body);
+  console.log(pathParams);
 
-  const id = body?.pk || "";
-  const date = body?.sk || "";
-  // const numDate = parseInt(date);
+  const table = getTable();
 
-  const getParams: DeleteItemCommandInput = {
-    TableName: tableName,
-    Key: marshall({ contentId:id , datePublishedEpox: date }),
-  };
-
-  const response = new DeleteItemCommand(getParams)
+  const contentPath = pathParams?.pk || "";
+  const epox = pathParams?.sk || '';
 
   try {
-    const result = await ddbClient.send(response);
-    return { statusCode: 200, body: `deleted: ${JSON.stringify(result)}` };
+    let result = await table.models.articleModel.remove({
+      contentPath,
+      datePublishedEpox: epox,
+      });
+
+      let response;
+      if(result === undefined){
+        response = 'no record exists'
+      }else{
+        response = JSON.stringify(result)
+      }
+
+    return { statusCode: 200, body: `deleted: ${response}}` };
   } catch (error) {
     return { statusCode: 400, body: JSON.stringify(error) };
   };
