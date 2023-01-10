@@ -1,6 +1,6 @@
 // import * as AWS from "aws-sdk";
 import { APIGatewayEvent } from "aws-lambda";
-import { getTable } from "../../database/getTable";
+import { getTable } from "../../../database/getTable";
 
 
 
@@ -21,7 +21,7 @@ export const handler = async (event: APIGatewayEvent) => {
       datePublishedEpox: article.sk,
       section: article.section,
       body: article.body,
-      author: article.author,
+      author: article.author,     
     });
     return { statusCode: 200, body: JSON.stringify(editor) };
   } catch (err) {

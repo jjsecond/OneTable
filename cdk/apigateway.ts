@@ -11,6 +11,8 @@ import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 import * as path from "path";
 import { appEnv, tableName } from "../config/config";
+import { AttributeType, GlobalSecondaryIndexProps, ProjectionType } from "aws-cdk-lib/aws-dynamodb";
+import { lambdasConfig } from "./vars/vars";
 
 export class ApiStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -51,56 +53,24 @@ export class ApiStack extends Stack {
       readCapacity: 1,
     });
 
-    [
-      {
-        name: "getContentByID",
-        method: "GET",
-        addId: true,
-        lambdaFolder: "article",
+    const globalSecondaryIndexProps: GlobalSecondaryIndexProps = {
+      indexName: 'gsi1',
+      partitionKey: {
+        name: 'gsi1pk',
+        type: AttributeType.STRING,
       },
-      {
-        name: "getAllContent",
-        method: "GET",
-        addId: false,
-        lambdaFolder: "article",
+      sortKey: {
+        name: 'gsi1sk',
+        type: AttributeType.STRING,
       },
-      {
-        name: "upsertContent",
-        method: "PUT",
-        addId: false,
-        lambdaFolder: "article",
-      },
-      {
-        name: "deleteContent",
-        method: "DELETE",
-        addId: true,
-        lambdaFolder: "article",
-      },
-      {
-        name: "getAuthorById",
-        method: "GET",
-        addId: true,
-        lambdaFolder: "author",
-      },
-      {
-        name: "getAllAuthors",
-        method: "GET",
-        addId: false,
-        lambdaFolder: "author",
-      },
-      {
-        name: "createAnAuthor",
-        method: "PUT",
-        addId: false,
-        lambdaFolder: "author",
-      },
-      {
-        name: "deleteAuthor",
-        method: "DELETE",
-        addId: true,
-        lambdaFolder: "author",
-      },
-    ].forEach((func) => {
+      projectionType: ProjectionType.KEYS_ONLY,
+      readCapacity: 1,
+      writeCapacity: 1,
+    };
+
+    dynamoDbTable.addGlobalSecondaryIndex(globalSecondaryIndexProps);
+
+    lambdasConfig.forEach((func) => {
       const lambdaFunction = new NodejsFunction(
         this,
         `${name}${func.name}Lambda`,
@@ -116,6 +86,7 @@ export class ApiStack extends Stack {
             "..",
             "src",
             "apigateway",
+            func.lambdaFolder,
             func.name,
             "handler.ts"
           ),

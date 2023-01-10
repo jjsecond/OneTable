@@ -1,6 +1,6 @@
 // import * as AWS from "aws-sdk";
 import { APIGatewayEvent } from "aws-lambda";
-import { getTable } from "../../database/getTable";
+import { getTable } from "../../../database/getTable";
 
 export const handler = async (event: APIGatewayEvent) => {
   const pathParams = event.pathParameters;
@@ -9,13 +9,13 @@ export const handler = async (event: APIGatewayEvent) => {
 
   const table = getTable();
 
-  const firstName = pathParams?.pk || "";
-  const lastName = pathParams?.sk || "";
+  const contentPath = pathParams?.pk || "";
+  const epox = pathParams?.sk || '';
 
   try {
-    let result = await table.models.editorModel.remove({
-        firstName,
-        lastName
+    let result = await table.models.articleModel.remove({
+      contentPath,
+      datePublishedEpox: epox,
       });
 
       let response;

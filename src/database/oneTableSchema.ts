@@ -3,7 +3,7 @@ export const MySchema = {
     version: '0.0.1',
     indexes: {
         primary: { hash: 'pk', sort: 'sk' },
-        // gs1:     { hash: 'gs1pk', sort: 'gs1sk', follow: true },
+        gs1:     { hash: 'gs1pk' },
         // ls1:     { sort: 'id', type: 'local' },
     },
     models: {
@@ -17,19 +17,19 @@ export const MySchema = {
             body: { type: String },
             author: { type: String },
 
-            gsi1pk: { type: String, value: 'article-section#${section}' },
+            gsi1pk: { type: String, value: 'article' },
             // gsi1sk: { type: String, value: 'print-attribute#${region}' },
         },
         Editor: {
             pk:          { type: String, value: 'user#${firstName}' },
-            sk:          { type: String, value: 'user#${lastName}' },
+            sk:          { type: String, value: 'user-name#${lastName}' },
             // id:          { type: String, required: true },
             firstName:   { type: String, required: true },
             lastName:    { type: String, required: true },
             username:    { type: String, required: true },
             role:        { type: String, enum: ['author', 'editor'], required: true, default: 'author' },
             // articlesWritten:     { type: Number, default: 0 },
-            // gs1pk:       { type: String, value: 'editor-email#${}' },
+            gs1pk:       { type: String, value: 'editor' },
             // gs1sk:       { type: String, value: 'user:' },
         }
     },

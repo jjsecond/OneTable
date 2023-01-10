@@ -1,6 +1,6 @@
-const region = 'eu-west-2';
-const appEnv = 'JtestOneTable';
-const tableName = 'JJsDynamo';
+const region = 'eu-north-1';
+const appEnv = 'Jtest2OneTable';
+const tableName = 'JJs2Dynamo';
 
 
 export {region, appEnv, tableName}

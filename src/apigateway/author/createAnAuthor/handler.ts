@@ -1,6 +1,6 @@
 // import * as AWS from "aws-sdk";
 
-import { getTable } from "../../database/getTable";
+import { getTable } from "../../../database/getTable";
 import { APIGatewayEvent } from "aws-lambda";
 
 

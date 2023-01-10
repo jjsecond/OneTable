@@ -7,12 +7,12 @@ import { Article, Editor } from "./types";
 import { GetTable } from "./types/getTable";
 import { region, tableName } from "../../config/config";
 
+const client = new Dynamo({
+  client: new DynamoDBClient({ region: region }),
+});
 
 const getTable: GetTable = () => {
 
-  const client = new Dynamo({
-    client: new DynamoDBClient({ region: region }),
-  });
 
   const table = new Table({
     client: client,

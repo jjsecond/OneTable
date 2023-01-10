@@ -1,4 +1,4 @@
-import { getTable } from "../../database/getTable";
+import { getTable } from "../../../database/getTable";
   
   export const handler = async () => {
     const table = getTable();

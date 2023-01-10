@@ -1,6 +1,6 @@
 // import * as AWS from "aws-sdk";
 import { APIGatewayEvent } from "aws-lambda";
-import { getTable } from "../../database/getTable";
+import { getTable } from "../../../database/getTable";
 
 export const handler = async (event: APIGatewayEvent) => {
   const pathParams = event.pathParameters;
@@ -9,13 +9,11 @@ export const handler = async (event: APIGatewayEvent) => {
 
   const table = getTable();
 
-  const contentPath = pathParams?.pk || "";
-  const epox = pathParams?.sk || '';
+  const globalSecondary = 'article';
 
   try {
     let result = await table.models.articleModel.find({
-      contentPath,
-      datePublishedEpox: epox,
+      gsi1pk: globalSecondary
     });
     return { statusCode: 200, body: `Found: ${JSON.stringify(result)}` };
   } catch (error) {

@@ -4,7 +4,7 @@ import {
   ScanCommandInput,
 } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
-import { region, tableName } from "../../../config/config";
+import { region, tableName } from "../../../../config/config";
 
 
 const ddbClient = new DynamoDB({ region: region });
