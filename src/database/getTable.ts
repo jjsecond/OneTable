@@ -3,7 +3,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import Dynamo from "dynamodb-onetable/Dynamo";
 import { MySchema } from "./oneTableSchema";
 
-import { Article, Editor } from "./types";
+import { Article, Editor, Image } from "./types";
 import { GetTable } from "./types/getTable";
 import { region, tableName } from "../../config/config";
 
@@ -22,6 +22,7 @@ const getTable: GetTable = () => {
 
   const editorModel = table.getModel<Editor>("Editor");
   const articleModel = table.getModel<Article>("Article");
+  const imageModel = table.getModel<Image>("Image");
 
   return {
     client,
@@ -29,6 +30,7 @@ const getTable: GetTable = () => {
     models: {
       editorModel,
       articleModel,
+      imageModel,
     },
   };
 };

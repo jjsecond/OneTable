@@ -17,8 +17,8 @@ export const handler = async (event: APIGatewayEvent) => {
 
   try {
     let editor = await table.models.articleModel.create({
-      contentPath: article.pk,
-      datePublishedEpox: article.sk,
+      contentPath: article.contentPath,
+      datePublishedEpox: article.datePublishedEpox,
       section: article.section,
       body: article.body,
       author: article.author,     
