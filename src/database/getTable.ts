@@ -26,7 +26,7 @@ const getTable: GetTable = () => {
 
   return {
     client,
-    table: tableName,
+    table,
     models: {
       editorModel,
       articleModel,

@@ -24,7 +24,7 @@ export const lambdasConfig = [
     lambdaFolder: "article",
   },
   {
-    name: "upsertContent",
+    name: "upsertContentTransaction",
     method: "PUT",
     addId: false,
     lambdaFolder: "article",
