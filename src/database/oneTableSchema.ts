@@ -35,13 +35,13 @@ export const MySchema = {
       },
       articlesWritten: { type: Number, default: 0, required: true },
       // ttl needs to be an epoch type in seconds
-      ttl: {
-        ttl: true,
-        type: Number,
-        default: () => {
-          return Math.floor(Date.now() / 1000 + 10);
-        },
-      },
+      // ttl: {
+      //   ttl: true,
+      //   type: Number,
+      //   default: () => {
+      //     return Math.floor(Date.now() / 1000 + 10);
+      //   },
+      // },
       gs1pk: { type: String, value: "editor" },
       // gs1sk:       { type: String, value: 'user:' },
     },

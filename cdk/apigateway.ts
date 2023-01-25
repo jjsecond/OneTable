@@ -37,6 +37,7 @@ export class ApiStack extends Stack {
       },
     });
 
+
     const dynamoDbTable = new dynamodb.Table(this, `${name}DynamoTable`, {
       tableName: tableName,
       tableClass: dynamodb.TableClass.STANDARD,
@@ -115,6 +116,7 @@ export class ApiStack extends Stack {
       }
 
       switch (func.method) {
+        case "POST":
         case "PUT": // Explicitly grant write access
         case "DELETE":
           dynamoDbTable.grantReadWriteData(lambdaFunction);

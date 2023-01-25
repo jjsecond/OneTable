@@ -1,5 +1,17 @@
 export const lambdasConfig = [
   {
+    name: "batchWrite",
+    method: "POST",
+    addId: false,
+    lambdaFolder: "experimental",
+  },
+  {
+    name: "batchGet",
+    method: "POST",
+    addId: false,
+    lambdaFolder: "experimental",
+  },
+  {
     name: "paginateArticles",
     method: "POST",
     addId: false,
